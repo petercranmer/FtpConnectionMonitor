@@ -15,13 +15,16 @@ namespace ConnectionMonitor
 
         protected readonly IList<DateTime> networkFailures = new List<DateTime>();
         private readonly IPersistentConnectionFactory persitentConnectionFactory;
+        private readonly int statsUpdateFrequency;
 
-        public ConnectionMonitor(string logFile, IPersistentConnectionFactory persitentConnectionFactory)
+        public ConnectionMonitor(string logFile, IPersistentConnectionFactory persitentConnectionFactory, int statsUpdateFrequency)
         {
             this.logFile = logFile;
             this.persitentConnectionFactory = persitentConnectionFactory;
         }
-        
+
+        public bool DebugOutput { get; set; } = false;
+
         public void Start()
         {
             while (true)
@@ -58,7 +61,7 @@ namespace ConnectionMonitor
 
             connection.Connect();
 
-            this.Debug(connection, $"Connection established");
+            this.Log(connection, $"Connection established");
 
             while (true)
             {
@@ -78,7 +81,7 @@ namespace ConnectionMonitor
         private void Log(IPersistentConnection persistentConnection, string message)
         {
             this.Debug(persistentConnection, message);
-
+            
             using (var writer = File.AppendText(this.logFile))
             {
                 writer.WriteLine(
@@ -89,9 +92,12 @@ namespace ConnectionMonitor
 
         private void Debug(IPersistentConnection persistentConnection, string message)
         {
-            Console.Out.WriteLineAsync(
-                this.FormatAsLog(persistentConnection, message)
-            );
+            if (this.DebugOutput)
+            {
+                Console.Out.WriteLineAsync(
+                    this.FormatAsLog(persistentConnection, message)
+                );
+            }
         }
 
         private string FormatAsLog(IPersistentConnection persistentConnection, string message)

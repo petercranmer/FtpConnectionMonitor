@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Net;
 using Microsoft.Exchange.WebServices.Data;
 
@@ -7,6 +6,9 @@ namespace ConnectionMonitor.ExchangeEws
 {
     public class ExchangeEwsPersistentConnectionFactory : IPersistentConnectionFactory
     {
+        // Set to a relatively low value so that we get quick feedback when the server goes down.
+        private const int TIMEOUT_SECONDS = 5;
+
         private string endPoint;
         private string username;
         private string password;
@@ -26,8 +28,13 @@ namespace ConnectionMonitor.ExchangeEws
             service.UseDefaultCredentials = false; // Exchange 365
 
             service.KeepAlive = true;
+            service.Timeout = TIMEOUT_SECONDS * 1000;
             
-            return new ExchangeEwsPersistentConnection(service, this.username, this.RedirectionUrlValidationCallback);
+            return new ExchangeEwsPersistentConnection(
+                service, 
+                this.username, 
+                this.RedirectionUrlValidationCallback
+            );
         }
         
         private bool RedirectionUrlValidationCallback(string redirectionUrl)

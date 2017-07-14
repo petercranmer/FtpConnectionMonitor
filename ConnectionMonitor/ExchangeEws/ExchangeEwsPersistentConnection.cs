@@ -26,6 +26,7 @@ namespace ConnectionMonitor.ExchangeEws
         /// </remarks>
         public bool IsConnected => (this.connectionException == null);
         
+        // Keep alive doesn't do anything so set quite low so it regularly verifies the connection.
         public int KeepAliveInteralSeconds => 15;
 
         public string Name => $"exchange://{this.service.Url}";
