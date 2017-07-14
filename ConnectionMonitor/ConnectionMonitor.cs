@@ -15,9 +15,8 @@ namespace ConnectionMonitor
 
         protected readonly IList<DateTime> networkFailures = new List<DateTime>();
         private readonly IPersistentConnectionFactory persitentConnectionFactory;
-        private readonly int statsUpdateFrequency;
 
-        public ConnectionMonitor(string logFile, IPersistentConnectionFactory persitentConnectionFactory, int statsUpdateFrequency)
+        public ConnectionMonitor(string logFile, IPersistentConnectionFactory persitentConnectionFactory)
         {
             this.logFile = logFile;
             this.persitentConnectionFactory = persitentConnectionFactory;
