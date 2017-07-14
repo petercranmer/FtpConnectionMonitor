@@ -79,7 +79,7 @@ namespace ConnectionMonitor
 
         private void Log(IPersistentConnection persistentConnection, string message)
         {
-            this.Debug(persistentConnection, message);
+            this.OutputMessageToConsole(persistentConnection, message);
             
             using (var writer = File.AppendText(this.logFile))
             {
@@ -93,15 +93,20 @@ namespace ConnectionMonitor
         {
             if (this.DebugOutput)
             {
-                Console.Out.WriteLineAsync(
-                    this.FormatAsLog(persistentConnection, message)
-                );
+                OutputMessageToConsole(persistentConnection, message);
             }
         }
-
+        
         private string FormatAsLog(IPersistentConnection persistentConnection, string message)
         {
             return $"[{persistentConnection.Name}] {DateTime.Now.ToString()}: {message}";
+        }
+
+        private void OutputMessageToConsole(IPersistentConnection persistentConnection, string message)
+        {
+            Console.Out.WriteLineAsync(
+                this.FormatAsLog(persistentConnection, message)
+            );
         }
 
         private bool IsFailureNew()
