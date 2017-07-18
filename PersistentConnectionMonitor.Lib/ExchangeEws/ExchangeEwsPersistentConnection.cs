@@ -4,7 +4,7 @@ using Microsoft.Exchange.WebServices.Data;
 
 namespace PersistentConnectionMonitor.Lib.ExchangeEws
 {
-    class ExchangeEwsPersistentConnection : IPersistentConnection
+    class ExchangeEwsPersistentConnection : PersistentConnection, IPersistentConnection
     {
         private readonly ExchangeService service;
         private readonly string emailAddress;
@@ -16,7 +16,7 @@ namespace PersistentConnectionMonitor.Lib.ExchangeEws
         private const int CONNECTION_EVENT_WAIT_PERIOD_SECONDS = 60;
 
         private StreamingSubscriptionConnection persistentConnection;
-                
+
         public ExchangeEwsPersistentConnection(ExchangeService service, string emailAddress, AutodiscoverRedirectionUrlValidationCallback autoDiscoverCallback)
         {
             this.service = service;
@@ -46,7 +46,7 @@ namespace PersistentConnectionMonitor.Lib.ExchangeEws
                 EventType.NewMail
             );
 
-            this.persistentConnection = new StreamingSubscriptionConnection(service, 30);
+            this.persistentConnection = new StreamingSubscriptionConnection(service, 1);
 
             this.persistentConnection.AddSubscription(subscription);
             this.persistentConnection.OnNotificationEvent += Connection_OnNotificationEvent;
@@ -103,6 +103,11 @@ namespace PersistentConnectionMonitor.Lib.ExchangeEws
                 {
                     this.persistentConnection.Open();
                     this.timeConnectionPolledFalse = null;
+
+                    this.OnDebug(
+                        this,
+                        "Connection gracefully restored to Exchange - scheduled disconnect"
+                    );
                 }
                 catch (Exception reconnectException)
                 {

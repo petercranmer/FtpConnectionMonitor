@@ -2,6 +2,8 @@
 
 namespace PersistentConnectionMonitor.Lib
 {
+    public delegate void ConnectionDebugEventDelegate(IPersistentConnection persistentConnection, string message);
+
     public interface IPersistentConnection : IDisposable
     {
         bool IsConnected { get; }
@@ -10,5 +12,7 @@ namespace PersistentConnectionMonitor.Lib
 
         void Connect();
         void KeepAlive();
+
+        event ConnectionDebugEventDelegate Debug;
     }
 }

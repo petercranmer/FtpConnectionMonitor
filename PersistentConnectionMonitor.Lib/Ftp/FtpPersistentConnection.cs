@@ -2,7 +2,7 @@
 
 namespace PersistentConnectionMonitor.Lib.Ftp
 {
-    class FtpPersistentConnection : IPersistentConnection
+    class FtpPersistentConnection : PersistentConnection, IPersistentConnection
     {
         private readonly FtpClient ftpClient;
 

@@ -32,6 +32,7 @@ namespace PersistentConnectionMonitor.Lib
                 {
                     try
                     {
+                        connection.Debug += this.Debug;
                         this.StartConnectionMonitor(connection);
                     }
                     catch (Exception e)
@@ -53,6 +54,7 @@ namespace PersistentConnectionMonitor.Lib
                 }
             }
         }
+        
 
         private void StartConnectionMonitor(IPersistentConnection connection)
         {

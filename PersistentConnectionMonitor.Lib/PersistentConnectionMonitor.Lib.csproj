@@ -60,6 +60,7 @@
     <Compile Include="Ftp\FtpPersistentConnectionFactory.cs" />
     <Compile Include="IPersistentConnection.cs" />
     <Compile Include="IPersistentConnectionFactory.cs" />
+    <Compile Include="PersistentConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
