@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FtpConnectionMonitor", "FtpConnectionMonitor\FtpConnectionMonitor.csproj", "{F1766597-0C37-4A71-A608-5F2B860D32BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersistentConnectionMonitor", "FtpConnectionMonitor\PersistentConnectionMonitor.csproj", "{F1766597-0C37-4A71-A608-5F2B860D32BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectionMonitor", "ConnectionMonitor\ConnectionMonitor.csproj", "{A398F995-F295-4787-A0C6-F89177458724}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersistentConnectionMonitor.Lib", "ConnectionMonitor\PersistentConnectionMonitor.Lib.csproj", "{A398F995-F295-4787-A0C6-F89177458724}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

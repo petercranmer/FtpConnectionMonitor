@@ -2,7 +2,7 @@
 using System.Net;
 using Microsoft.Exchange.WebServices.Data;
 
-namespace ConnectionMonitor.ExchangeEws
+namespace PersistentConnectionMonitor.Lib.ExchangeEws
 {
     public class ExchangeEwsPersistentConnectionFactory : IPersistentConnectionFactory
     {

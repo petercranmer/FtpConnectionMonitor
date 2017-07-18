@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ConnectionMonitor
+namespace PersistentConnectionMonitor.Lib
 {
     public interface IPersistentConnection : IDisposable
     {

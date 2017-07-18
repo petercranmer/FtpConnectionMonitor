@@ -2,7 +2,7 @@
 using Microsoft.Exchange.WebServices.Autodiscover;
 using Microsoft.Exchange.WebServices.Data;
 
-namespace ConnectionMonitor.ExchangeEws
+namespace PersistentConnectionMonitor.Lib.ExchangeEws
 {
     class ExchangeEwsPersistentConnection : IPersistentConnection
     {

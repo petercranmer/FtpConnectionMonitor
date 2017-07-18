@@ -1,6 +1,6 @@
 ﻿using FluentFTP;
 
-namespace ConnectionMonitor.Ftp
+namespace PersistentConnectionMonitor.Lib.Ftp
 {
     class FtpPersistentConnection : IPersistentConnection
     {

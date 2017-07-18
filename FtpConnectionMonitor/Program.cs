@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Configuration;
 using System.Linq;
-using ConnectionMonitor.ExchangeEws;
-using ConnectionMonitor.Ftp;
+using PersistentConnectionMonitor.Lib;
+using PersistentConnectionMonitor.Lib.ExchangeEws;
+using PersistentConnectionMonitor.Lib.Ftp;
 
-namespace ConnectionMonitor
+namespace PersistentConnectionMonitor
 {
     class Program
     {

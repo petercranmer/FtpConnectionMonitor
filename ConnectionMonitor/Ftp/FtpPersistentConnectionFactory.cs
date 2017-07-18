@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using FluentFTP;
 
-namespace ConnectionMonitor.Ftp
+namespace PersistentConnectionMonitor.Lib.Ftp
 {
     public class FtpPersistentConnectionFactory : IPersistentConnectionFactory
     {
