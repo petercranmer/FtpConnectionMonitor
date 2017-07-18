@@ -69,6 +69,10 @@ namespace ConnectionMonitor.ExchangeEws
             {
                 throw this.connectionException;
             }
+            if (!this.persistentConnection.IsOpen)
+            {
+                throw new Exception("Persistent connection dropped without event notification");
+            }
         }        
 
         private void Connection_OnDisconnect(object sender, SubscriptionErrorEventArgs args)
@@ -79,7 +83,14 @@ namespace ConnectionMonitor.ExchangeEws
             }
             else
             {
-                this.persistentConnection.Open();
+                try
+                {
+                    this.persistentConnection.Open();
+                }
+                catch (Exception reconnectException)
+                {
+                    this.connectionException = reconnectException;
+                }
             }
         }
 
