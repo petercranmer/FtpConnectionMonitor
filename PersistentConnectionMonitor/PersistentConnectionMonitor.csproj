@@ -53,7 +53,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ConnectionMonitor\PersistentConnectionMonitor.Lib.csproj">
+    <ProjectReference Include="..\PersistentConnectionMonitor.Lib\PersistentConnectionMonitor.Lib.csproj">
       <Project>{a398f995-f295-4787-a0c6-f89177458724}</Project>
       <Name>PersistentConnectionMonitor.Lib</Name>
     </ProjectReference>
