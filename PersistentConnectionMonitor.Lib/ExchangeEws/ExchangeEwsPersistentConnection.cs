@@ -6,15 +6,42 @@ namespace PersistentConnectionMonitor.Lib.ExchangeEws
 {
     class ExchangeEwsPersistentConnection : PersistentConnection, IPersistentConnection
     {
+        private string lockObject = "LOCK";
+
         private readonly ExchangeService service;
         private readonly string emailAddress;
         private readonly AutodiscoverRedirectionUrlValidationCallback autoDiscoverCallback;
 
+        /// <summary>
+        /// The exception given by the disconnect handler, which is later thrown when the
+        /// connection is polled.
+        /// </summary>
         private Exception connectionException = null;
 
+        /// <summary>
+        /// The time when the connection first responded that it was closed during polling.
+        /// </summary>
         private DateTime? timeConnectionPolledFalse = null;
-        private const int CONNECTION_EVENT_WAIT_PERIOD_SECONDS = 60;
-        private const int EXCHANGE_FORCED_RECONNECT_MINUTES = 30;
+
+        /// <summary>
+        /// Describes the number of seconds to wait for a disconnect event if the connection is
+        /// discovered to be closed during polling.  This prevents race conditions causing the 
+        /// graceful disconnects to be interpreted as a drop out.
+        /// </summary>
+        private const int DISCONNECT_EVENT_GRACE_PERIOD_SECONDS = 60;
+
+        /// <summary>
+        /// The maximum length of a session.  The server will gracefully close the connection
+        /// after this length of time has passed.  This is not to be considered a drop out.
+        /// </summary>
+        private const int SESSION_LIFETIME_MINUTES = 30;
+
+        /// <summary>
+        /// Flags the connection as disconnected gracefully (due to max session length).  When 
+        /// polling, if this is set the connection will be reopened without a drop-out being 
+        /// registered.
+        /// </summary>
+        private bool connectionClosedGracefully = false;
 
         private StreamingSubscriptionConnection persistentConnection;
 
@@ -48,8 +75,8 @@ namespace PersistentConnectionMonitor.Lib.ExchangeEws
             );
 
             this.persistentConnection = new StreamingSubscriptionConnection(
-                service, 
-                EXCHANGE_FORCED_RECONNECT_MINUTES
+                service,
+                SESSION_LIFETIME_MINUTES
             );
 
             this.persistentConnection.AddSubscription(subscription);
@@ -72,50 +99,78 @@ namespace PersistentConnectionMonitor.Lib.ExchangeEws
         /// </remarks>
         public void KeepAlive()
         {
-            if (this.connectionException != null)
+            lock (this.lockObject)
             {
-                throw this.connectionException;
-            }
-
-            if (!this.persistentConnection.IsOpen)
-            {
-                if (this.timeConnectionPolledFalse == null)
+                if (this.connectionException != null)
                 {
-                    this.timeConnectionPolledFalse = DateTime.Now;
+                    throw this.connectionException;
                 }
-                else
-                {
-                    var elapsedSinceConnectionPolledFalse = DateTime.Now.Subtract(this.timeConnectionPolledFalse.Value);
 
-                    if (elapsedSinceConnectionPolledFalse.TotalSeconds > CONNECTION_EVENT_WAIT_PERIOD_SECONDS)
+                if (this.connectionClosedGracefully)
+                {
+                    this.persistentConnection.Open();
+                    this.timeConnectionPolledFalse = null;
+                    
+                    this.OnDebug(
+                        this,
+                        "Gracefully closed connection restored"
+                    );
+                    this.connectionClosedGracefully = false;
+                }
+
+                if (!this.persistentConnection.IsOpen)
+                {
+                    if (this.timeConnectionPolledFalse == null)
                     {
-                        throw new Exception("Persistent connection dropped without event notification");
-                    }                    
+                        this.timeConnectionPolledFalse = DateTime.Now;
+                        this.OnDebug(this, "Connection disconnected but awaiting notification from server");
+                    }
+                    else
+                    {
+                        var elapsedSinceConnectionPolledFalse = DateTime.Now.Subtract(
+                            this.timeConnectionPolledFalse.Value
+                        );
+
+                        if (elapsedSinceConnectionPolledFalse.TotalSeconds > DISCONNECT_EVENT_GRACE_PERIOD_SECONDS)
+                        {
+                            throw new Exception("Persistent connection dropped without event notification");
+                        }
+                        else
+                        {
+                            this.OnDebug(
+                                this,
+                                "Connection still disconnected - awaiting notification from server " +
+                                $"until {DISCONNECT_EVENT_GRACE_PERIOD_SECONDS} seconds have elapsed"
+                            );
+                        }
+                    }
                 }
             }
         }        
 
         private void Connection_OnDisconnect(object sender, SubscriptionErrorEventArgs args)
         {
-            if (args.Exception != null)
+            lock (this.lockObject)
             {
-                this.connectionException = args.Exception;
-            }
-            else
-            {
-                try
+                if (args.Exception != null)
                 {
-                    this.persistentConnection.Open();
-                    this.timeConnectionPolledFalse = null;
+                    this.connectionException = args.Exception;
+                }
+                else
+                {
+                    // It should be possible to reconnect here, but due to a bug in EWS
+                    // this is not possible:
+                    //
+                    // https://github.com/OfficeDev/ews-managed-api/issues/83
+                    //
+                    // The Nuget package is ancient but other than this workaround it's easier
+                    // to use than to download the source and build for this project.
 
                     this.OnDebug(
                         this,
-                        "Connection gracefully restored to Exchange - scheduled disconnect"
+                        "Connect has been closed gracefully due to max session limit, connection will be restored"
                     );
-                }
-                catch (Exception reconnectException)
-                {
-                    this.connectionException = reconnectException;
+                    this.connectionClosedGracefully = true;
                 }
             }
         }
