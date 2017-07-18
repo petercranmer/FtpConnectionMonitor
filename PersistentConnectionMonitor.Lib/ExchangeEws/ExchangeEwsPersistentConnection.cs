@@ -12,6 +12,9 @@ namespace PersistentConnectionMonitor.Lib.ExchangeEws
 
         private Exception connectionException = null;
 
+        private DateTime? timeConnectionPolledFalse = null;
+        private const int CONNECTION_EVENT_WAIT_PERIOD_SECONDS = 60;
+
         private StreamingSubscriptionConnection persistentConnection;
                 
         public ExchangeEwsPersistentConnection(ExchangeService service, string emailAddress, AutodiscoverRedirectionUrlValidationCallback autoDiscoverCallback)
@@ -69,9 +72,22 @@ namespace PersistentConnectionMonitor.Lib.ExchangeEws
             {
                 throw this.connectionException;
             }
+
             if (!this.persistentConnection.IsOpen)
             {
-                throw new Exception("Persistent connection dropped without event notification");
+                if (this.timeConnectionPolledFalse == null)
+                {
+                    this.timeConnectionPolledFalse = DateTime.Now;
+                }
+                else
+                {
+                    var elapsedSinceConnectionPolledFalse = DateTime.Now.Subtract(this.timeConnectionPolledFalse.Value);
+
+                    if (elapsedSinceConnectionPolledFalse.TotalSeconds > CONNECTION_EVENT_WAIT_PERIOD_SECONDS)
+                    {
+                        throw new Exception("Persistent connection dropped without event notification");
+                    }                    
+                }
             }
         }        
 
@@ -86,6 +102,7 @@ namespace PersistentConnectionMonitor.Lib.ExchangeEws
                 try
                 {
                     this.persistentConnection.Open();
+                    this.timeConnectionPolledFalse = null;
                 }
                 catch (Exception reconnectException)
                 {

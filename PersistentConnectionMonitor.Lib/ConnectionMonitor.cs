@@ -93,7 +93,9 @@ namespace PersistentConnectionMonitor.Lib
         {
             if (this.DebugOutput)
             {
-                OutputMessageToConsole(persistentConnection, message);
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                this.OutputMessageToConsole(persistentConnection, message);
+                Console.ResetColor();
             }
         }
         

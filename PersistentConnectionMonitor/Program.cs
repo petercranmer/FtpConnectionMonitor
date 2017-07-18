@@ -13,7 +13,9 @@ namespace PersistentConnectionMonitor
         {
             if (args.Length != 3 && args.Length != 5)
             {
-                Console.Out.WriteLine("Usage: FtpConnectionMonitor.exe type hostname logFile [username] [password]");
+                Console.Out.WriteLine(
+                    $"Usage: {nameof(PersistentConnectionMonitor)}.exe type hostname logFile [username] [password]"
+                );
                 return;
             }
 
