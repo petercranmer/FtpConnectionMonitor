@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Configuration;
 using System.Linq;
-using ConnectionMonitor;
 using ConnectionMonitor.ExchangeEws;
 using ConnectionMonitor.Ftp;
 
@@ -25,6 +25,15 @@ namespace ConnectionMonitor
             var factory = CreateFactory(type, hostname, username, password);
 
             var monitor = new ConnectionMonitor(logFile, factory);
+
+            var debugOutput = false;
+
+            bool.TryParse(
+                ConfigurationManager.AppSettings["DebugOutput"],
+                out debugOutput
+            );
+
+            monitor.DebugOutput = debugOutput;
 
             monitor.Start();
         }
