@@ -14,6 +14,7 @@ namespace PersistentConnectionMonitor.Lib.ExchangeEws
 
         private DateTime? timeConnectionPolledFalse = null;
         private const int CONNECTION_EVENT_WAIT_PERIOD_SECONDS = 60;
+        private const int EXCHANGE_FORCED_RECONNECT_MINUTES = 30;
 
         private StreamingSubscriptionConnection persistentConnection;
 
@@ -46,7 +47,10 @@ namespace PersistentConnectionMonitor.Lib.ExchangeEws
                 EventType.NewMail
             );
 
-            this.persistentConnection = new StreamingSubscriptionConnection(service, 1);
+            this.persistentConnection = new StreamingSubscriptionConnection(
+                service, 
+                EXCHANGE_FORCED_RECONNECT_MINUTES
+            );
 
             this.persistentConnection.AddSubscription(subscription);
             this.persistentConnection.OnNotificationEvent += Connection_OnNotificationEvent;
